@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PlaceOfInterestActivity">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- MAIN IMAGE -->
+
+        <ImageView
+            android:id="@+id/poi_main_image"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:contentDescription="@string/todo"
+            android:src="@drawable/poi_main_image_placeholder"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- NAME -->
+
+        <TextView
+            android:id="@+id/poi_name_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/poi_name_label_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/poi_main_image"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/poi_name_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:ems="8"
+            android:hint="@string/poi_name_hint"
+            android:inputType="textCapWords"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/poi_main_image"
+            app:layout_constraintTop_toBottomOf="@id/poi_name_label" />
+
+        <!-- RATING -->
+
+        <TextView
+            android:id="@+id/poi_rating_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/poi_rating_label_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/poi_main_image"
+            app:layout_constraintTop_toBottomOf="@id/poi_name_text" />
+
+        <RatingBar
+            android:id="@+id/poi_ratingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleX=".8"
+            android:scaleY=".8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/poi_main_image"
+            app:layout_constraintTop_toBottomOf="@id/poi_rating_label" />
+
+        <!-- CATEGORY -->
+
+        <TextView
+            android:id="@+id/poi_cat_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/poi_cat_label_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/poi_main_image"
+            app:layout_constraintTop_toBottomOf="@+id/poi_ratingBar" />
+
+        <Spinner
+            android:id="@+id/poi_cat_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/poi_main_image"
+            app:layout_constraintTop_toBottomOf="@id/poi_cat_label" />
+
+        <!-- DESCRIPTION -->
+
+        <TextView
+            android:id="@+id/poi_descr_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/poi_descr_label_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/poi_main_image" />
+
+        <EditText
+            android:id="@+id/poi_descr_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textLongMessage"
+            android:autofillHints=""
+            android:ems="10"
+            android:hint="@string/poi_descr_hint"
+            app:layout_constraintBaseline_toBaselineOf="@id/poi_descr_label"
+            app:layout_constraintStart_toEndOf="@id/poi_descr_label" />
+
+        <!-- NOTES -->
+
+        <TextView
+            android:id="@+id/poi_notes_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/poi_notes_label_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/poi_descr_label" />
+
+        <EditText
+            android:id="@+id/poi_notes_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:autofillHints=""
+            android:ems="10"
+            android:hint="@string/poi_notes_hint"
+            app:layout_constraintBaseline_toBaselineOf="@id/poi_notes_label"
+            app:layout_constraintStart_toStartOf="@id/poi_descr_text" />
+
+        <!-- MAP
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/poi_location_mapview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/poi_notes_text" /> -->
+
+        <!-- IMAGES -->
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/poi_image_recycleview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:scrollbars="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/poi_notes_text" />
+
+        <!-- DATE ADDED -->
+
+        <TextView
+            android:id="@+id/poi_date_added_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/poi_date_added_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/poi_image_recycleview"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/poi_placeholder_date"
+            app:layout_constraintStart_toEndOf="@id/poi_date_added_label"
+            app:layout_constraintBaseline_toBaselineOf="@id/poi_date_added_label" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

@@ -1,17 +1,15 @@
 package com.example.travelcompanionapp;
 
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
-import com.google.android.material.snackbar.Snackbar;
-
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
 
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,13 +40,16 @@ public class MainActivity extends AppCompatActivity {
         binding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int placeOfInterestListSize = mPlaceOfInterestList.size();
+                /*int placeOfInterestListSize = mPlaceOfInterestList.size();
                 // Add a new word to the wordList.
                 mPlaceOfInterestList.addLast("+ Word " + placeOfInterestListSize);
                 // Notify the adapter that the data has changed.
-                mRecyclerView.getAdapter().notifyItemInserted(placeOfInterestListSize);
+                Objects.requireNonNull(mRecyclerView.getAdapter()).notifyItemInserted(placeOfInterestListSize);
                 // Scroll to the bottom.
-                mRecyclerView.smoothScrollToPosition(placeOfInterestListSize);
+                mRecyclerView.smoothScrollToPosition(placeOfInterestListSize);*/
+                Intent poiIntent = new Intent(MainActivity.this, PlaceOfInterestActivity.class);
+                startActivity(poiIntent);
+
             }
         });
 
@@ -63,7 +65,29 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
         // Give the RecyclerView a default layout manager.
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        //requestLocationPermissions();
     }
+
+    /*@RequiresApi(api = Build.VERSION_CODES.N)
+    private void requestLocationPermissions() {
+        ActivityResultLauncher<String[]> locationPermissionRequest =
+                registerForActivityResult(new ActivityResultContracts
+                                .RequestMultiplePermissions(), result -> {
+                            Boolean fineLocationGranted = result.getOrDefault(
+                                    Manifest.permission.ACCESS_FINE_LOCATION, false);
+                            Boolean coarseLocationGranted = result.getOrDefault(
+                                    Manifest.permission.ACCESS_COARSE_LOCATION,false);
+                            if (fineLocationGranted != null && fineLocationGranted) {
+                                // Precise location access granted.
+                            } else if (coarseLocationGranted != null && coarseLocationGranted) {
+                                // Only approximate location access granted.
+                            } else {
+                                // No location access granted.
+                            }
+                        }
+                );
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
