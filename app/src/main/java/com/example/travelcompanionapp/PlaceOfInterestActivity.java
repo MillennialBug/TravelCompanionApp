@@ -53,7 +53,7 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements OnMapR
         mPlaceOfInterestImageList.addLast(R.drawable.zoo4);
 
         // Get a handle to the RecyclerView.
-        mRecyclerView = findViewById(R.id.recyclerview);
+        mRecyclerView = findViewById(R.id.poi_image_recycleview);
         // Create an adapter and supply the data to be displayed.
         mAdapter = new PlaceOfInterestImageAdapter(this, mPlaceOfInterestImageList);
         // Connect the adapter with the RecyclerView.
