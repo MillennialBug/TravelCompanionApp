@@ -4,34 +4,42 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class PlaceOfInterestAdapter extends
         RecyclerView.Adapter<PlaceOfInterestAdapter.PlaceOfInterestHolder>{
-    private final LinkedList<String> mPlaceOfInterestList;
+    private final RecyclerViewInterface recyclerViewInterface;
+    private final ArrayList<PlaceOfInterest> mPlaceOfInterestList;
     private LayoutInflater mInflater;
 
-    public PlaceOfInterestAdapter(Context context, LinkedList<String> placeOfInterestList) {
+    public PlaceOfInterestAdapter(Context context, ArrayList<PlaceOfInterest> placeOfInterestList,
+                                  RecyclerViewInterface recyclerViewInterface) {
         mInflater = LayoutInflater.from(context);
         this.mPlaceOfInterestList = placeOfInterestList;
+        this.recyclerViewInterface = recyclerViewInterface;
     }
 
     @NonNull
     @Override
     public PlaceOfInterestHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View mItemView = mInflater.inflate(R.layout.placeofinterest_item, parent, false);
-        return new PlaceOfInterestHolder(mItemView, this);
+        return new PlaceOfInterestHolder(mItemView, this, recyclerViewInterface);
     }
 
     @Override
     public void onBindViewHolder(@NonNull PlaceOfInterestHolder holder, int position) {
-        String mCurrent = mPlaceOfInterestList.get(position);
-        holder.placeOfInterestItemView.setText(mCurrent);
+        PlaceOfInterest mCurrent = mPlaceOfInterestList.get(position);
+        holder.placeOfInterestNameText.setText(mCurrent.getName());
+        holder.placeOfInterestDescrText.setText(mCurrent.getShortDescription());
+        holder.placeOfInterestDateAddedText.setText(mCurrent.getDateAdded());
+        holder.placeOfInterestMainImage.setImageResource(mCurrent.getMainImage());
     }
 
     @Override
@@ -39,29 +47,46 @@ public class PlaceOfInterestAdapter extends
         return mPlaceOfInterestList.size();
     }
 
-    class PlaceOfInterestHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    static class PlaceOfInterestHolder extends RecyclerView.ViewHolder {
 
-        public final TextView placeOfInterestItemView;
+        public final TextView placeOfInterestNameText;
+        public final TextView placeOfInterestDateAddedText;
+        public final TextView placeOfInterestDescrText;
+        public final ImageView placeOfInterestMainImage;
         final PlaceOfInterestAdapter mAdapter;
 
-        public PlaceOfInterestHolder(@NonNull View itemView, PlaceOfInterestAdapter adapter) {
+        public PlaceOfInterestHolder(@NonNull View itemView, PlaceOfInterestAdapter adapter, RecyclerViewInterface recyclerViewInterface) {
             super(itemView);
-            placeOfInterestItemView = itemView.findViewById(R.id.poi_name_text);
+            placeOfInterestNameText = itemView.findViewById(R.id.poi_item_name_text);
+            placeOfInterestDateAddedText = itemView.findViewById(R.id.poi_item_date_added_text);
+            placeOfInterestDescrText = itemView.findViewById(R.id.poi_item_descr_text);
+            placeOfInterestMainImage = itemView.findViewById(R.id.poi_item_main_image);
             this.mAdapter = adapter;
-            itemView.setOnClickListener(this);
-        }
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (recyclerViewInterface != null){
+                        int position = getAdapterPosition();
 
-        @Override
-        public void onClick(View view) {
-            // Get the position of the item that was clicked.
-            int mPosition = getLayoutPosition();
-            // Use that to access the affected item in mWordList.
-            String element = mPlaceOfInterestList.get(mPosition);
-            // Change the word in the mWordList.
-            mPlaceOfInterestList.set(mPosition, "Clicked! " + element);
-            // Notify the adapter that the data has changed so it can
-            // update the RecyclerView to display the data.
-            mAdapter.notifyDataSetChanged();
+                        if (position != RecyclerView.NO_POSITION){
+                            recyclerViewInterface.onItemClick(position);
+                        }
+                    }
+                }
+            });
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    if (recyclerViewInterface != null){
+                        int position = getAdapterPosition();
+
+                        if (position != RecyclerView.NO_POSITION){
+                            recyclerViewInterface.onItemLongClick(position);
+                        }
+                    }
+                    return true;
+                }
+            });
         }
     }
 }

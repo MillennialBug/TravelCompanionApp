@@ -18,10 +18,11 @@ import com.example.travelcompanionapp.databinding.ActivityMainBinding;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity {
-    private final LinkedList<String> mPlaceOfInterestList = new LinkedList<>();
+public class MainActivity extends AppCompatActivity implements RecyclerViewInterface{
+    private ArrayList<PlaceOfInterest> mPlaceOfInterestList = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private PlaceOfInterestAdapter mAdapter;
     private AppBarConfiguration appBarConfiguration;
@@ -34,33 +35,31 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         setSupportActionBar(binding.toolbar);
-
         binding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*int placeOfInterestListSize = mPlaceOfInterestList.size();
+                int placeOfInterestListSize = mPlaceOfInterestList.size();
                 // Add a new word to the wordList.
-                mPlaceOfInterestList.addLast("+ Word " + placeOfInterestListSize);
+                mPlaceOfInterestList.add(new PlaceOfInterest("New Place " + placeOfInterestListSize, "A new place!"));
                 // Notify the adapter that the data has changed.
                 Objects.requireNonNull(mRecyclerView.getAdapter()).notifyItemInserted(placeOfInterestListSize);
                 // Scroll to the bottom.
-                mRecyclerView.smoothScrollToPosition(placeOfInterestListSize);*/
-                Intent poiIntent = new Intent(MainActivity.this, PlaceOfInterestActivity.class);
-                startActivity(poiIntent);
-
+                mRecyclerView.smoothScrollToPosition(placeOfInterestListSize);
+                //TODO: call on click to move to activity.
             }
         });
 
-        for (int i = 0; i < 20; i++) {
-            mPlaceOfInterestList.addLast("Word " + i);
+        if (savedInstanceState != null) {
+            mPlaceOfInterestList = savedInstanceState.getParcelableArrayList("poiList");
+        }else {
+            setUpPoiList();
         }
 
         // Get a handle to the RecyclerView.
         mRecyclerView = findViewById(R.id.recyclerview);
         // Create an adapter and supply the data to be displayed.
-        mAdapter = new PlaceOfInterestAdapter(this, mPlaceOfInterestList);
+        mAdapter = new PlaceOfInterestAdapter(this, mPlaceOfInterestList, this);
         // Connect the adapter with the RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         // Give the RecyclerView a default layout manager.
@@ -89,6 +88,18 @@ public class MainActivity extends AppCompatActivity {
                 );
     }*/
 
+    public void setUpPoiList() {
+        // Add POI objects to list.
+        mPlaceOfInterestList.add(new PlaceOfInterest("Dudley Zoo", "A zoo and castle in Dudley.", R.drawable.zoo1));
+        mPlaceOfInterestList.add(new PlaceOfInterest("Buckingham Palace", "Palace of the Queen of England."));
+        mPlaceOfInterestList.add(new PlaceOfInterest("Stonehenge", "Random rocks in the English countryside."));
+        mPlaceOfInterestList.add(new PlaceOfInterest("Sweet Emporium", "Large sweet shop in Wakefield"));
+        mPlaceOfInterestList.add(new PlaceOfInterest("National Science and Media Museum", "Museum celebrating science, TV, Film and Video Games."));
+        mPlaceOfInterestList.add(new PlaceOfInterest("Molineux", "Football Staidum for Wolves."));
+        mPlaceOfInterestList.add(new PlaceOfInterest("Merry Hill", "Large shopping complex in Dudley, UK."));
+        mPlaceOfInterestList.add(new PlaceOfInterest("Appleloosa", "A desert town with crazy Ponies feat Apple Orchards."));
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -109,5 +120,24 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("poiList", mPlaceOfInterestList);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        Intent poiIntent = new Intent(MainActivity.this, PlaceOfInterestActivity.class);
+        //TODO: PASS POI ITEM TO ACTIVITY AND READ IT IN ON THE OTHER SIDE.
+        startActivity(poiIntent);
+    }
+
+    @Override
+    public void onItemLongClick(int position) {
+        mPlaceOfInterestList.remove(position);
+        mAdapter.notifyItemRemoved(position);
     }
 }
