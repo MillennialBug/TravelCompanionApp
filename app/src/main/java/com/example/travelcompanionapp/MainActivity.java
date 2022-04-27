@@ -1,10 +1,12 @@
 package com.example.travelcompanionapp;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
@@ -17,6 +19,7 @@ import com.example.travelcompanionapp.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -27,6 +30,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
     private PlaceOfInterestAdapter mAdapter;
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
+
+    public static final String POI_LIST =
+            "com.example.android.travelcompanionapp.extra.POI_LIST";
+    public static final String POI_EXTRA =
+            "com.example.android.travelcompanionapp.extra.POI_EXTRA";
+    public static final String POI_POS =
+            "com.example.android.travelcompanionapp.extra.POI_POS";
+    public static final int NEW_POI_REQUEST = 1;
+    public static final int EDIT_POI_REQUEST = 2;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -40,18 +52,16 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             @Override
             public void onClick(View view) {
                 int placeOfInterestListSize = mPlaceOfInterestList.size();
-                // Add a new word to the wordList.
-                mPlaceOfInterestList.add(new PlaceOfInterest("New Place " + placeOfInterestListSize, "A new place!"));
-                // Notify the adapter that the data has changed.
-                Objects.requireNonNull(mRecyclerView.getAdapter()).notifyItemInserted(placeOfInterestListSize);
-                // Scroll to the bottom.
-                mRecyclerView.smoothScrollToPosition(placeOfInterestListSize);
-                //TODO: call on click to move to activity.
+                Intent poiIntent = new Intent(MainActivity.this, PlaceOfInterestActivity.class);
+                poiIntent.putExtra(POI_EXTRA, new PlaceOfInterest());
+                poiIntent.putExtra(POI_POS, placeOfInterestListSize);
+                startActivityForResult(poiIntent, NEW_POI_REQUEST);
             }
         });
 
         if (savedInstanceState != null) {
-            mPlaceOfInterestList = savedInstanceState.getParcelableArrayList("poiList");
+            System.out.println("onCreate");
+            mPlaceOfInterestList = savedInstanceState.getParcelableArrayList(POI_LIST);
         }else {
             setUpPoiList();
         }
@@ -124,20 +134,65 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList("poiList", mPlaceOfInterestList);
+        outState.putParcelableArrayList(POI_LIST, mPlaceOfInterestList);
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onItemClick(int position) {
         Intent poiIntent = new Intent(MainActivity.this, PlaceOfInterestActivity.class);
-        //TODO: PASS POI ITEM TO ACTIVITY AND READ IT IN ON THE OTHER SIDE.
-        startActivity(poiIntent);
+        poiIntent.putExtra(POI_EXTRA, mPlaceOfInterestList.get(position));
+        poiIntent.putExtra(POI_POS, position);
+        startActivityForResult(poiIntent, EDIT_POI_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode,
+                                 int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        int pos = data.getIntExtra(POI_POS, 0);
+        if (requestCode == NEW_POI_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                // Add a new poi to the list.
+                mPlaceOfInterestList.add(data.getParcelableExtra(POI_EXTRA));
+                // Notify the adapter that the data has changed.
+
+                Objects.requireNonNull(mRecyclerView.getAdapter()).notifyItemInserted(pos);
+                // Scroll to the bottom.
+                mRecyclerView.smoothScrollToPosition(pos);
+            }
+        } else if (requestCode == EDIT_POI_REQUEST) {
+            System.out.println("onActivityResult");
+            mPlaceOfInterestList.set(pos, data.getParcelableExtra(POI_EXTRA));
+            mAdapter.notifyItemChanged(data.getIntExtra(POI_POS, 0));
+        }
     }
 
     @Override
     public void onItemLongClick(int position) {
-        mPlaceOfInterestList.remove(position);
-        mAdapter.notifyItemRemoved(position);
+        String poiName = mPlaceOfInterestList.get(position).getName();
+        AlertDialog.Builder myAlertBuilder = new
+                AlertDialog.Builder(MainActivity.this);
+        // Set the dialog title and message.
+        myAlertBuilder.setTitle("Please confirm");
+        myAlertBuilder.setMessage("Do you want to delete " + poiName + "?");
+        // Add the dialog buttons.
+        myAlertBuilder.setPositiveButton("YES", new
+                DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // User clicked YES button.
+                        mPlaceOfInterestList.remove(position);
+                        mAdapter.notifyItemRemoved(position);
+                    }
+                });
+        myAlertBuilder.setNegativeButton("NO", new
+                DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // User clicked NO button.
+                    }
+                });
+
+        myAlertBuilder.show();
+
     }
 }

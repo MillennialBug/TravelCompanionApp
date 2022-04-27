@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -16,8 +17,8 @@ public class PlaceOfInterest implements Parcelable {
     private Long rating;
     private String category;
     private String notes;
+    //private int[] photos;
     //location
-    //photos
 
     public PlaceOfInterest(String name, String shortDescription) {
         this.name = name;
@@ -62,18 +63,20 @@ public class PlaceOfInterest implements Parcelable {
     public String getName(){
         return this.name;
     }
-
     public void setName(String name) {this.name = name;}
 
     public String getShortDescription() {
         return this.shortDescription;
     }
+    public void setShortDescription(String shortDescription) { this.shortDescription = shortDescription; }
 
     public String getDateAdded() {
         return this.dateAdded;
     }
+    public void setDateAdded(String dateAdded) { this.dateAdded = dateAdded; }
 
     public int getMainImage() { return this.mainImage; }
+    public void setMainImage(int mainImage) { this.mainImage = mainImage; }
 
     @Override
     public int describeContents() {

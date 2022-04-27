@@ -19,8 +19,10 @@
     <string name="poi_rating_label_text">Rating</string>
     <string name="poi_notes_label_text">Notes</string>
     <string name="poi_notes_hint">Enter notes</string>
-    <string name="poi_date_added_text">Date Added</string>
+    <string name="poi_date_added_text">Added</string>
     <string name="poi_placeholder_date">17th April 2022</string>
+    <string name="button_save_text">Save</string>
+    <string name="button_cancel_text">Cancel</string>
 
     <string-array name="poi_cat_array">
         <item>Amusement Park</item>
