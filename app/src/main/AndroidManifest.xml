@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.travelcompanionapp">
 
-    <!-- AIzaSyCBZYZOWlR1QJshZUFIH_OiJUIrVM3DMH4 -->
-
     <!-- Always include this permission -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
