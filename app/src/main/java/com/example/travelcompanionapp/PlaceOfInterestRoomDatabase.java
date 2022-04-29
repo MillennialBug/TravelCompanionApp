@@ -1,6 +1,10 @@
 package com.example.travelcompanionapp;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
@@ -9,7 +13,9 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {PlaceOfInterest.class}, version = 1, exportSchema = false)
+import java.io.File;
+
+@Database(entities = {PlaceOfInterest.class}, version = 3, exportSchema = false)
 public abstract class PlaceOfInterestRoomDatabase extends RoomDatabase {
 
     public abstract PlaceOfInterestDAO placeOfInterestDAO();
@@ -45,9 +51,11 @@ public abstract class PlaceOfInterestRoomDatabase extends RoomDatabase {
 
     private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
 
+            File file = new File("");
             private final PlaceOfInterestDAO mDao;
             PlaceOfInterest[] placeOfInterests = {
-                    new PlaceOfInterest("Dudley Zoo", "A zoo and castle in Dudley.", R.drawable.zoo1, 3.5f, 11, "This is a Zoo in the Black Country town of Dudley."),
+                    //new PlaceOfInterest("Dudley Zoo", "A zoo and castle in Dudley.", 3.5f, 11, "This is a Zoo in the Black Country town of Dudley.", ((BitmapDrawable)Drawable.createFromPath("/storage/emulated/0/Download/zoo1.jpg")).getBitmap()),
+                    new PlaceOfInterest("Dudley Zoo", "A zoo and castle in Dudley.", 3.5f, 11, "This is a Zoo in the Black Country town of Dudley."),
                     new PlaceOfInterest("Buckingham Palace", "Palace of the Queen of England.", 4.0f, 5, "Royal Palace in London, England. Popular tourist destination."),
                     new PlaceOfInterest("Stonehenge", "Random rocks in the English countryside.", 3.0f, 7, "How did they get here? No one really seems to know."),
                     new PlaceOfInterest("Sweet Emporium", "Large sweet shop in Wakefield", 4.0f, 8, "Sells imported sweets and goodies. Expensive."),

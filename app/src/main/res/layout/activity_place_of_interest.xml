@@ -125,7 +125,6 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:text="@string/poi_notes_label_text"
-            android:ems="15"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/poi_descr_label" />
 
@@ -135,7 +134,7 @@
             android:layout_height="wrap_content"
             android:inputType="textMultiLine"
             android:autofillHints=""
-            android:ems="10"
+            android:ems="15"
             android:hint="@string/poi_notes_hint"
             app:layout_constraintBaseline_toBaselineOf="@id/poi_notes_label"
             app:layout_constraintStart_toStartOf="@id/poi_descr_text" />
@@ -190,8 +189,9 @@
             android:id="@+id/button_save"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/button_save_text"
+            android:layout_marginTop="8dp"
             android:background="@color/green"
+            android:text="@string/button_save_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/poi_date_added_text" />
@@ -202,8 +202,9 @@
             android:id="@+id/button_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/button_cancel_text"
+            android:layout_marginTop="8dp"
             android:background="@color/red"
+            android:text="@string/button_cancel_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/button_save" />

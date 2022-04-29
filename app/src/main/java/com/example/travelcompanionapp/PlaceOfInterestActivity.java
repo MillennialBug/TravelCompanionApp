@@ -1,8 +1,17 @@
 package com.example.travelcompanionapp;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,6 +23,9 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 public class PlaceOfInterestActivity extends AppCompatActivity {
 
@@ -77,7 +89,7 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
     public void initialisePoi(PlaceOfInterest poi) {
         mPoiName.setText(poi.getName());
         mPoiDescr.setText(poi.getShortDescription());
-        mPoiMainImage.setImageResource(poi.getMainImage());
+        //mPoiMainImage.setImageBitmap(poi.getBitmapAsBitmap());
         mPoiDateAdded.setText(poi.getDateAdded());
         mPoiSpinner.setSelection(poi.getCategory());
         mNotes.setText(poi.getNotes());
@@ -96,6 +108,33 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
         }
         finish();
     }
+
+    private void pickImage() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        pickImageResultLauncher.launch(Intent.createChooser(intent, "Select Picture"));
+    }
+    ActivityResultLauncher<Intent> pickImageResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    Intent intent = result.getData();
+                    if (result.getResultCode() == RESULT_OK) {
+                        assert intent != null;
+                        try {
+                            InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(intent.getData());
+                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                            mPlaceOfInterest.setBitmap(bitmap);
+                            mPoiMainImage.setImageBitmap(bitmap);
+
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
 
     private void createSpinner(){
         // Create an ArrayAdapter using the string array and a default spinner layout
@@ -130,6 +169,12 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 returnReply(mCancelButton);
+            }
+        });
+        mPoiMainImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickImage();
             }
         });
     }

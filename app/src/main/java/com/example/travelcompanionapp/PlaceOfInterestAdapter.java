@@ -39,7 +39,7 @@ public class PlaceOfInterestAdapter extends
             holder.placeOfInterestNameText.setText(mCurrent.getName());
             holder.placeOfInterestDescrText.setText(mCurrent.getShortDescription());
             holder.placeOfInterestDateAddedText.setText(mCurrent.getDateAdded());
-            holder.placeOfInterestMainImage.setImageResource(mCurrent.getMainImage());
+            //holder.placeOfInterestMainImage.setImageBitmap(mCurrent.getBitmapAsBitmap());
         }
     }
 
