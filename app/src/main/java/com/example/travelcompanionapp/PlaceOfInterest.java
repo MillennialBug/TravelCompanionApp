@@ -3,19 +3,42 @@ package com.example.travelcompanionapp;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+@Entity(tableName = "place_of_interest")
 public class PlaceOfInterest implements Parcelable {
 
+    @PrimaryKey(autoGenerate = true)
+    @NonNull
+    @ColumnInfo(name = "id")
+    private int id;
+
+    @ColumnInfo(name = "main_image")
     private int mainImage;
+
+    @ColumnInfo(name = "name")
     private String name;
+
+    @ColumnInfo(name = "short_description")
     private String shortDescription;
+
+    @ColumnInfo(name = "date_added")
     private String dateAdded;
+
+    @ColumnInfo(name = "rating")
     private Float rating;
+
+    @ColumnInfo(name = "catergory")
     private int category;
+
+    @ColumnInfo(name = "notes")
     private String notes;
     //private int[] photos;
     //location
@@ -42,9 +65,11 @@ public class PlaceOfInterest implements Parcelable {
 
     public PlaceOfInterest(){
         setDateAdded();
+        setRating(0f);
     }
 
     protected PlaceOfInterest(Parcel in) {
+        id = in.readInt();
         name = in.readString();
         shortDescription = in.readString();
         dateAdded = in.readString();
@@ -65,6 +90,9 @@ public class PlaceOfInterest implements Parcelable {
             return new PlaceOfInterest[size];
         }
     };
+
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
     public String getName(){
         return this.name;
@@ -100,6 +128,7 @@ public class PlaceOfInterest implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(id);
         parcel.writeString(name);
         parcel.writeString(shortDescription);
         parcel.writeString(dateAdded);

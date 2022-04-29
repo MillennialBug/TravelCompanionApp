@@ -24,7 +24,7 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
     private TextView mPoiDateAdded;
     private TextView mNotes;
     private RatingBar mRating;
-    private int mPosition;
+    private int mPosition = 0;
     private Button mSaveButton;
     private Button mCancelButton;
     private PlaceOfInterest mPlaceOfInterest;
@@ -49,8 +49,15 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         // Retrieve POI info from Intent
-        mPosition = intent.getIntExtra(MainActivity.POI_POS, 0);
-        mPlaceOfInterest = intent.getParcelableExtra(MainActivity.POI_EXTRA);
+        if (intent.hasExtra(MainActivity.POI_POS))
+            mPosition = intent.getIntExtra(MainActivity.POI_POS, 0);
+
+        if (intent.hasExtra(MainActivity.POI_EXTRA)) {
+            mPlaceOfInterest = intent.getParcelableExtra(MainActivity.POI_EXTRA);
+        } else {
+            mPlaceOfInterest = new PlaceOfInterest();
+        }
+
         initialisePoi(mPlaceOfInterest);
 
         //Set up spinner.
