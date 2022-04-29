@@ -33,6 +33,8 @@
         <item>Monument</item>
         <item>Museum</item>
         <item>Public Park</item>
+        <item>Shop</item>
+        <item>Sports Venue</item>
         <item>Theater</item>
         <item>Zoo</item>
     </string-array>

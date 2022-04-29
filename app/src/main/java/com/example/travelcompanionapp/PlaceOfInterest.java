@@ -14,23 +14,29 @@ public class PlaceOfInterest implements Parcelable {
     private String name;
     private String shortDescription;
     private String dateAdded;
-    private Long rating;
-    private String category;
+    private Float rating;
+    private int category;
     private String notes;
     //private int[] photos;
     //location
 
-    public PlaceOfInterest(String name, String shortDescription) {
-        this.name = name;
-        this.shortDescription = shortDescription;
-        this.mainImage = R.drawable.poi_main_image_placeholder;
+    public PlaceOfInterest(String name, String shortDescription, Float rating, int category, String notes) {
+        setName(name);
+        setShortDescription(shortDescription);
+        setMainImage(R.drawable.poi_main_image_placeholder);
+        setRating(rating);
+        setCategory(category);
+        setNotes(notes);
         setDateAdded();
     }
 
-    public PlaceOfInterest(String name, String shortDescription, int mainImage) {
-        this.name = name;
-        this.shortDescription = shortDescription;
-        this.mainImage = mainImage;
+    public PlaceOfInterest(String name, String shortDescription, int mainImage, Float rating, int category, String notes) {
+        setName(name);
+        setShortDescription(shortDescription);
+        setMainImage(mainImage);
+        setRating(rating);
+        setCategory(category);
+        setNotes(notes);
         setDateAdded();
     }
 
@@ -43,9 +49,9 @@ public class PlaceOfInterest implements Parcelable {
         shortDescription = in.readString();
         dateAdded = in.readString();
         mainImage = in.readInt();
-        //rating = in.readLong();
-        //category = in.readString();
-        //notes = in.readString();
+        rating = in.readFloat();
+        category = in.readInt();
+        notes = in.readString();
     }
 
     public static final Creator<PlaceOfInterest> CREATOR = new Creator<PlaceOfInterest>() {
@@ -78,6 +84,15 @@ public class PlaceOfInterest implements Parcelable {
     public int getMainImage() { return this.mainImage; }
     public void setMainImage(int mainImage) { this.mainImage = mainImage; }
 
+    public Float getRating() { return this.rating; }
+    public void setRating(Float rating) { this.rating = rating; }
+
+    public int getCategory() { return this.category; }
+    public void setCategory(int category) { this.category = category; }
+
+    public String getNotes() { return this.notes; }
+    public void setNotes(String notes) { this.notes = notes; }
+
     @Override
     public int describeContents() {
         return 0;
@@ -89,9 +104,9 @@ public class PlaceOfInterest implements Parcelable {
         parcel.writeString(shortDescription);
         parcel.writeString(dateAdded);
         parcel.writeInt(mainImage);
-        //parcel.writeLong(rating);
-        //parcel.writeString(category);
-        //parcel.writeString(notes);
+        parcel.writeFloat(rating);
+        parcel.writeInt(category);
+        parcel.writeString(notes);
     }
 
     private void setDateAdded(){

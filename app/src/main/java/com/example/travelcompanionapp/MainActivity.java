@@ -2,6 +2,8 @@ package com.example.travelcompanionapp;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -100,14 +102,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
 
     public void setUpPoiList() {
         // Add POI objects to list.
-        mPlaceOfInterestList.add(new PlaceOfInterest("Dudley Zoo", "A zoo and castle in Dudley.", R.drawable.zoo1));
-        mPlaceOfInterestList.add(new PlaceOfInterest("Buckingham Palace", "Palace of the Queen of England."));
-        mPlaceOfInterestList.add(new PlaceOfInterest("Stonehenge", "Random rocks in the English countryside."));
-        mPlaceOfInterestList.add(new PlaceOfInterest("Sweet Emporium", "Large sweet shop in Wakefield"));
-        mPlaceOfInterestList.add(new PlaceOfInterest("National Science and Media Museum", "Museum celebrating science, TV, Film and Video Games."));
-        mPlaceOfInterestList.add(new PlaceOfInterest("Molineux", "Football Staidum for Wolves."));
-        mPlaceOfInterestList.add(new PlaceOfInterest("Merry Hill", "Large shopping complex in Dudley, UK."));
-        mPlaceOfInterestList.add(new PlaceOfInterest("Appleloosa", "A desert town with crazy Ponies feat Apple Orchards."));
+        mPlaceOfInterestList.add(new PlaceOfInterest("Dudley Zoo", "A zoo and castle in Dudley.", R.drawable.zoo1, 3.5f, 11, "This is a Zoo in the Black Country town of Dudley."));
+        mPlaceOfInterestList.add(new PlaceOfInterest("Buckingham Palace", "Palace of the Queen of England.", 4.0f, 5, "Royal Palace in London, England. Popular tourist destination."));
+        mPlaceOfInterestList.add(new PlaceOfInterest("Stonehenge", "Random rocks in the English countryside.", 3.0f, 7, "How did they get here? No one really seems to know."));
+        mPlaceOfInterestList.add(new PlaceOfInterest("Sweet Emporium", "Large sweet shop in Wakefield", 4.0f, 8, "Sells imported sweets and goodies. Expensive."));
+        mPlaceOfInterestList.add(new PlaceOfInterest("National Science and Media Museum", "Museum celebrating science, TV, Film and Video Games.", 2.5f, 6, "Includes an Imax screen and a smaller cinema for indie films."));
+        mPlaceOfInterestList.add(new PlaceOfInterest("Molineux", "Football Staidum for Wolves.", 5.0f, 9, "Home to mighty Wolverhampton Wanderers. Heaven on Earth."));
+        mPlaceOfInterestList.add(new PlaceOfInterest("Merry Hill", "Large shopping complex in Dudley, UK.", 3.0f, 8, "One of those places that was way more enjoyable as a kid. Bring back the Monorail."));
+        mPlaceOfInterestList.add(new PlaceOfInterest("Appleloosa", "A desert town with crazy Ponies feat Apple Orchards.", 3.5f, 7, "Fictional place. Dummy data is hard."));
     }
 
     @Override
@@ -150,9 +152,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
     public void onActivityResult(int requestCode,
                                  int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        int pos = data.getIntExtra(POI_POS, 0);
+        int pos = 0;
         if (requestCode == NEW_POI_REQUEST) {
             if (resultCode == RESULT_OK) {
+                data.getIntExtra(POI_POS, 0);
                 // Add a new poi to the list.
                 mPlaceOfInterestList.add(data.getParcelableExtra(POI_EXTRA));
                 // Notify the adapter that the data has changed.
@@ -162,9 +165,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
                 mRecyclerView.smoothScrollToPosition(pos);
             }
         } else if (requestCode == EDIT_POI_REQUEST) {
-            System.out.println("onActivityResult");
-            mPlaceOfInterestList.set(pos, data.getParcelableExtra(POI_EXTRA));
-            mAdapter.notifyItemChanged(data.getIntExtra(POI_POS, 0));
+            if (resultCode == RESULT_OK) {
+                data.getIntExtra(POI_POS, 0);
+                mPlaceOfInterestList.set(pos, data.getParcelableExtra(POI_EXTRA));
+                mAdapter.notifyItemChanged(data.getIntExtra(POI_POS, 0));
+            }
         }
     }
 
