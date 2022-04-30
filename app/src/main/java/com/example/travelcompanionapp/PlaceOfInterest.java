@@ -72,7 +72,7 @@ public class PlaceOfInterest implements Parcelable {
         setDateAdded();
         setRating(0f);
         //setBitmap(((BitmapDrawable) Drawable.createFromPath("/storage/emulated/0/Download/poi_main_image_placeholder.png")).getBitmap());
-        setBitmap(new byte[1]);
+        setBitmap(MainActivity.BLANK_BITMAP);
     }
 
     protected PlaceOfInterest(Parcel in) {
@@ -83,6 +83,7 @@ public class PlaceOfInterest implements Parcelable {
         rating = in.readFloat();
         category = in.readInt();
         notes = in.readString();
+        //in.readByteArray(bitmap);
     }
 
     public static final Creator<PlaceOfInterest> CREATOR = new Creator<PlaceOfInterest>() {
@@ -152,6 +153,7 @@ public class PlaceOfInterest implements Parcelable {
         parcel.writeFloat(rating);
         parcel.writeInt(category);
         parcel.writeString(notes);
+        //parcel.writeByteArray(bitmap);
     }
 
     private void setDateAdded(){

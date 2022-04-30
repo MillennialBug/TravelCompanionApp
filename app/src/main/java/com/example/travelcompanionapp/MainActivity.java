@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
     private PlaceOfInterestAdapter mAdapter;
     private PlaceOfInterestViewModel mPlaceOfInterestViewModel;
 
+    public static final byte[] BLANK_BITMAP = new byte[1];
     public static final String POI_EXTRA =
             "com.example.android.travelcompanionapp.extra.POI_EXTRA";
     public static final String POI_POS =
@@ -97,13 +98,21 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        if (id == R.id.action_info) {
+            AlertDialog.Builder myAlertBuilder = new
+                    AlertDialog.Builder(MainActivity.this);
+            // Set the dialog title and message.
+            myAlertBuilder.setTitle("Instructions");
+            myAlertBuilder.setMessage("Add a Place of Interest with the plus button in the bottom corner.\n" +
+                    "Click an item to edit it.\n" +
+                    "Long click an item to delete.");
+            // Add the dialog buttons.
+            myAlertBuilder.setPositiveButton("OK", (dialog, which) -> {
+                // User clicked OK button.
+            });
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+            myAlertBuilder.show();
             return true;
         }
 

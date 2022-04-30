@@ -4,10 +4,14 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ShareCompat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -15,6 +19,7 @@ import android.media.Image;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,6 +29,7 @@ import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -37,9 +43,11 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
     private TextView mNotes;
     private RatingBar mRating;
     private int mPosition = 0;
+    private Button mShareButton;
     private Button mSaveButton;
     private Button mCancelButton;
     private PlaceOfInterest mPlaceOfInterest;
+    private String[] mCategories;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +62,7 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
         mPoiDateAdded = findViewById(R.id.poi_date_added_text);
         mPoiSpinner = findViewById(R.id.poi_cat_spinner);
         mNotes = findViewById(R.id.poi_notes_text);
+        mShareButton = findViewById(R.id.button_share);
         mSaveButton = findViewById(R.id.button_save);
         mCancelButton = findViewById(R.id.button_cancel);
 
@@ -71,6 +80,7 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
         }
 
         initialisePoi(mPlaceOfInterest);
+        initialiseCategories();
 
         //Set up spinner.
         createSpinner();
@@ -86,10 +96,23 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
         });
     }
 
+    private void initialiseCategories() {
+        Resources res = getResources();
+        TypedArray ta = res.obtainTypedArray(R.array.poi_cat_array);
+        int n = ta.length();
+        String[] array = new String[n];
+        for (int i = 0; i < n; ++i) {
+            array[i] = ta.getString(i);
+        }
+        mCategories = array;
+        ta.recycle(); // Important!
+    }
+
     public void initialisePoi(PlaceOfInterest poi) {
         mPoiName.setText(poi.getName());
         mPoiDescr.setText(poi.getShortDescription());
-        //mPoiMainImage.setImageBitmap(poi.getBitmapAsBitmap());
+        //if (poi.getBitmap() != MainActivity.BLANK_BITMAP)
+            //mPoiMainImage.setImageBitmap(poi.getBitmapAsBitmap());
         mPoiDateAdded.setText(poi.getDateAdded());
         mPoiSpinner.setSelection(poi.getCategory());
         mNotes.setText(poi.getNotes());
@@ -128,7 +151,6 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
                             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                             mPlaceOfInterest.setBitmap(bitmap);
                             mPoiMainImage.setImageBitmap(bitmap);
-
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }
@@ -159,6 +181,12 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
     }
 
     private void setButtonOnClicks() {
+        mShareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sharePlaceOfInterest();
+            }
+        });
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -241,7 +269,21 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
         }
         if (view == mNotes){
             mPlaceOfInterest.setNotes(mNotes.getText().toString());
-            return;
         }
+    }
+
+    public void sharePlaceOfInterest() {
+        String mimeType = "text/plain";
+        String txt = String.format("Hey! Check this place out!\n" +
+                "Name: %s\n" +
+                "Category: %s\n" +
+                "Description: %s", mPlaceOfInterest.getName(), mCategories[mPlaceOfInterest.getCategory()], mPlaceOfInterest.getShortDescription());
+        ShareCompat.IntentBuilder
+                .from(this)
+                .setType(mimeType)
+                .setChooserTitle("Share this text with: ")
+                .setText(txt)
+                .startChooser();
+
     }
 }
