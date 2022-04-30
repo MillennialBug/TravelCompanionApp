@@ -72,30 +72,24 @@ public class PlaceOfInterestAdapter extends
             placeOfInterestDateAddedText = itemView.findViewById(R.id.poi_item_date_added_text);
             placeOfInterestDescrText = itemView.findViewById(R.id.poi_item_descr_text);
             placeOfInterestMainImage = itemView.findViewById(R.id.poi_item_main_image);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (recyclerViewInterface != null){
-                        int position = getAdapterPosition();
+            itemView.setOnClickListener(view -> {
+                if (recyclerViewInterface != null){
+                    int position = getAdapterPosition();
 
-                        if (position != RecyclerView.NO_POSITION){
-                            recyclerViewInterface.onItemClick(position);
-                        }
+                    if (position != RecyclerView.NO_POSITION){
+                        recyclerViewInterface.onItemClick(position);
                     }
                 }
             });
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    if (recyclerViewInterface != null){
-                        int position = getAdapterPosition();
+            itemView.setOnLongClickListener(view -> {
+                if (recyclerViewInterface != null){
+                    int position = getAdapterPosition();
 
-                        if (position != RecyclerView.NO_POSITION){
-                            recyclerViewInterface.onItemLongClick(position);
-                        }
+                    if (position != RecyclerView.NO_POSITION){
+                        recyclerViewInterface.onItemLongClick(position);
                     }
-                    return true;
                 }
+                return true;
             });
         }
     }

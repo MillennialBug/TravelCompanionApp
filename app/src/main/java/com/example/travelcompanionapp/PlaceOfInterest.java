@@ -2,13 +2,11 @@ package com.example.travelcompanionapp;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
+import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -22,7 +20,6 @@ import java.util.Locale;
 public class PlaceOfInterest implements Parcelable {
 
     @PrimaryKey(autoGenerate = true)
-    @NonNull
     @ColumnInfo(name = "id")
     private int id;
 
@@ -46,8 +43,20 @@ public class PlaceOfInterest implements Parcelable {
 
     @ColumnInfo(name = "notes")
     private String notes;
+
+    @ColumnInfo(name = "location")
+    private String location;
+
+    @ColumnInfo(name = "longitude")
+    private Double longitude;
+
+    @ColumnInfo(name = "latitude")
+    private Double latitude;
+
+    @ColumnInfo(name = "userSetLocation")
+    private Boolean userSetLocation;
+
     //private int[] photos;
-    //location
 
     public PlaceOfInterest(String name, String shortDescription, Float rating, int category, String notes) {
         setName(name);
@@ -56,6 +65,10 @@ public class PlaceOfInterest implements Parcelable {
         setCategory(category);
         setNotes(notes);
         setDateAdded();
+        setBitmap(MainActivity.BLANK_BITMAP);
+        setLongitude(0d);
+        setLatitude(0d);
+        setUserSetLocation(Boolean.FALSE);
     }
 
     public PlaceOfInterest(String name, String shortDescription, Float rating, int category, String notes, Bitmap bitmap) {
@@ -73,8 +86,12 @@ public class PlaceOfInterest implements Parcelable {
         setRating(0f);
         //setBitmap(((BitmapDrawable) Drawable.createFromPath("/storage/emulated/0/Download/poi_main_image_placeholder.png")).getBitmap());
         setBitmap(MainActivity.BLANK_BITMAP);
+        setLongitude(0d);
+        setLatitude(0d);
+        setUserSetLocation(Boolean.FALSE);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     protected PlaceOfInterest(Parcel in) {
         id = in.readInt();
         name = in.readString();
@@ -83,10 +100,15 @@ public class PlaceOfInterest implements Parcelable {
         rating = in.readFloat();
         category = in.readInt();
         notes = in.readString();
+        location = in.readString();
+        longitude = in.readDouble();
+        latitude = in.readDouble();
+        userSetLocation = in.readBoolean();
         //in.readByteArray(bitmap);
     }
 
     public static final Creator<PlaceOfInterest> CREATOR = new Creator<PlaceOfInterest>() {
+        @RequiresApi(api = Build.VERSION_CODES.Q)
         @Override
         public PlaceOfInterest createFromParcel(Parcel in) {
             return new PlaceOfInterest(in);
@@ -139,11 +161,24 @@ public class PlaceOfInterest implements Parcelable {
     public String getNotes() { return this.notes; }
     public void setNotes(String notes) { this.notes = notes; }
 
+    public String getLocation() { return this.location; }
+    public void setLocation(String location) { this.location = location; setUserSetLocation(Boolean.TRUE);}
+
+    public Double getLongitude() { return this.longitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; setUserSetLocation(Boolean.FALSE);}
+
+    public Double getLatitude() { return latitude; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
+
+    public Boolean getUserSetLocation() { return userSetLocation; }
+    public void setUserSetLocation(Boolean userSetLocation) { this.userSetLocation = userSetLocation; }
+
     @Override
     public int describeContents() {
         return 0;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(id);
@@ -153,6 +188,10 @@ public class PlaceOfInterest implements Parcelable {
         parcel.writeFloat(rating);
         parcel.writeInt(category);
         parcel.writeString(notes);
+        parcel.writeString(location);
+        parcel.writeDouble(longitude);
+        parcel.writeDouble(latitude);
+        parcel.writeBoolean(userSetLocation);
         //parcel.writeByteArray(bitmap);
     }
 

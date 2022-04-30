@@ -1,25 +1,23 @@
 package com.example.travelcompanionapp;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ShareCompat;
-
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -29,11 +27,19 @@ import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.io.File;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ShareCompat;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-public class PlaceOfInterestActivity extends AppCompatActivity {
+public class PlaceOfInterestActivity extends AppCompatActivity implements LocationListener {
 
     private Spinner mPoiSpinner;
     private TextView mPoiName;
@@ -41,18 +47,32 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
     private ImageView mPoiMainImage;
     private TextView mPoiDateAdded;
     private TextView mNotes;
+    private TextView mPoiLocation;
     private RatingBar mRating;
     private int mPosition = 0;
+    private Button mMapButton;
     private Button mShareButton;
     private Button mSaveButton;
     private Button mCancelButton;
     private PlaceOfInterest mPlaceOfInterest;
     private String[] mCategories;
+    private LocationManager locationManager;
+    private Double mPoiLongitude;
+    private Double mPoiLatitude;
+    private Location mLocation;
+    private Context mContext;
+
+    // The minimum distance to change Updates in meters
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
+
+    // The minimum time between updates in milliseconds
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 60; // 1 minute
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_of_interest);
+        mContext = getApplicationContext();
 
         //Get views
         mPoiName = findViewById(R.id.poi_name_text);
@@ -61,10 +81,15 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
         mRating = findViewById(R.id.poi_ratingBar);
         mPoiDateAdded = findViewById(R.id.poi_date_added_text);
         mPoiSpinner = findViewById(R.id.poi_cat_spinner);
+        mPoiLocation = findViewById(R.id.poi_location_text);
         mNotes = findViewById(R.id.poi_notes_text);
+        mMapButton = findViewById(R.id.button_location);
         mShareButton = findViewById(R.id.button_share);
         mSaveButton = findViewById(R.id.button_save);
         mCancelButton = findViewById(R.id.button_cancel);
+
+        //Set LocationManager
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         // Get intent
         Intent intent = getIntent();
@@ -79,6 +104,11 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
             mPlaceOfInterest = new PlaceOfInterest();
         }
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+
         initialisePoi(mPlaceOfInterest);
         initialiseCategories();
 
@@ -88,11 +118,8 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
         // Set Listeners
         setButtonOnClicks();
         setTextChangeListeners();
-        mRating.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-            @Override
-            public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
-                if(b) mPlaceOfInterest.setRating(v);
-            }
+        mRating.setOnRatingBarChangeListener((ratingBar, v, b) -> {
+            if(b) mPlaceOfInterest.setRating(v);
         });
     }
 
@@ -117,6 +144,17 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
         mPoiSpinner.setSelection(poi.getCategory());
         mNotes.setText(poi.getNotes());
         mRating.setRating(poi.getRating());
+        if(poi.getName() == null){
+            getLocation();
+        } else {
+            mPoiLongitude = poi.getLongitude();
+            mPoiLatitude = poi.getLatitude();
+        }
+        if(mPlaceOfInterest.getUserSetLocation()){
+            mPoiLocation.setText(poi.getLocation());
+        } else {
+            mPoiLocation.setText(String.format("%s, %s",mPoiLongitude.toString(), mPoiLatitude.toString()));
+        }
     }
 
     public void returnReply(View view) {
@@ -181,78 +219,47 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
     }
 
     private void setButtonOnClicks() {
-        mShareButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sharePlaceOfInterest();
-            }
-        });
-        mSaveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                returnReply(mSaveButton);
-            }
-        });
-        mCancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                returnReply(mCancelButton);
-            }
-        });
-        mPoiMainImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pickImage();
-            }
-        });
+        mMapButton.setOnClickListener(view -> viewOnMap());
+        mShareButton.setOnClickListener(view -> sharePlaceOfInterest());
+        mSaveButton.setOnClickListener(view -> returnReply(mSaveButton));
+        mCancelButton.setOnClickListener(view -> returnReply(mCancelButton));
+        mPoiMainImage.setOnClickListener(view -> pickImage());
     }
 
     private void setTextChangeListeners() {
         mPoiName.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
             @Override
             public void afterTextChanged(Editable editable) {
                 itemChanged(mPoiName);
             }
         });
-
         mPoiDescr.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
             @Override
             public void afterTextChanged(Editable editable) {
                 itemChanged(mPoiDescr);
             }
         });
-
+        mPoiLocation.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+            @Override
+            public void afterTextChanged(Editable editable) { itemChanged(mPoiLocation);}
+        });
         mNotes.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
             @Override
             public void afterTextChanged(Editable editable) { itemChanged(mNotes); }
         });
@@ -267,12 +274,16 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
             mPlaceOfInterest.setShortDescription(mPoiDescr.getText().toString());
             return;
         }
+        if (view == mPoiLocation) {
+            mPlaceOfInterest.setLocation(mPoiLocation.getText().toString());
+            return;
+        }
         if (view == mNotes){
             mPlaceOfInterest.setNotes(mNotes.getText().toString());
         }
     }
 
-    public void sharePlaceOfInterest() {
+    private void sharePlaceOfInterest() {
         String mimeType = "text/plain";
         String txt = String.format("Hey! Check this place out!\n" +
                 "Name: %s\n" +
@@ -284,6 +295,74 @@ public class PlaceOfInterestActivity extends AppCompatActivity {
                 .setChooserTitle("Share this text with: ")
                 .setText(txt)
                 .startChooser();
+    }
 
+    private void viewOnMap() {
+        // Get the string indicating a location. Input is not validated; it is
+        // passed to the location handler intact.
+        if (!mPlaceOfInterest.getLocation().isEmpty() || mPlaceOfInterest.getLocation() != null) {
+
+            // Parse the location and create the intent.
+            Uri addressUri = Uri.parse("geo:0,0?q=" + mPlaceOfInterest.getLocation());
+            Intent intent = new Intent(Intent.ACTION_VIEW, addressUri);
+
+            // Find an activity to handle the intent, and start that activity.
+            if (intent.resolveActivity(getPackageManager()) != null) {
+                startActivity(intent);
+            }
+        }
+    }
+
+    private void getLocation(){
+        // getting GPS status
+        Boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        // getting network status
+        Boolean isNetworkEnabled = locationManager
+                .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        if (isGPSEnabled) {
+            if (mLocation == null) {
+                //check the network permission
+                if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions((Activity) mContext, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
+                }
+                locationManager.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER,
+                        MIN_TIME_BW_UPDATES,
+                        MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+                Log.d("GPS Enabled", "GPS Enabled");
+                if (locationManager != null) {
+                    mLocation = locationManager
+                            .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+                    if (mLocation != null) {
+                        mPoiLatitude = mLocation.getLatitude();
+                        mPoiLongitude = mLocation.getLongitude();
+                        mPlaceOfInterest.setLongitude(mPoiLongitude);
+                        mPlaceOfInterest.setLatitude(mPoiLatitude);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(@NonNull String provider) {
+        LocationListener.super.onProviderEnabled(provider);
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
     }
 }

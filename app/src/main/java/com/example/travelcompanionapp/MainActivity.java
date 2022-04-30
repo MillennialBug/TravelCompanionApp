@@ -1,5 +1,11 @@
 package com.example.travelcompanionapp;
+
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -10,6 +16,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,7 +27,7 @@ import com.example.travelcompanionapp.databinding.ActivityMainBinding;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity implements RecyclerViewInterface{
+public class MainActivity extends AppCompatActivity implements RecyclerViewInterface {
     private RecyclerView mRecyclerView;
     private PlaceOfInterestAdapter mAdapter;
     private PlaceOfInterestViewModel mPlaceOfInterestViewModel;
@@ -64,30 +72,18 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             mAdapter.setPlaceOfInterests(placeOfInterests);
         });
 
-
-
-        //requestLocationPermissions();
+        requestLocation();
     }
 
-    /*@RequiresApi(api = Build.VERSION_CODES.N)
-    private void requestLocationPermissions() {
-        ActivityResultLauncher<String[]> locationPermissionRequest =
-                registerForActivityResult(new ActivityResultContracts
-                                .RequestMultiplePermissions(), result -> {
-                            Boolean fineLocationGranted = result.getOrDefault(
-                                    Manifest.permission.ACCESS_FINE_LOCATION, false);
-                            Boolean coarseLocationGranted = result.getOrDefault(
-                                    Manifest.permission.ACCESS_COARSE_LOCATION,false);
-                            if (fineLocationGranted != null && fineLocationGranted) {
-                                // Precise location access granted.
-                            } else if (coarseLocationGranted != null && coarseLocationGranted) {
-                                // Only approximate location access granted.
-                            } else {
-                                // No location access granted.
-                            }
-                        }
-                );
-    }*/
+    private void requestLocation() {
+        try {
+            if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 101);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

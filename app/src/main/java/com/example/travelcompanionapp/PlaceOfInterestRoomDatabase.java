@@ -15,7 +15,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import java.io.File;
 
-@Database(entities = {PlaceOfInterest.class}, version = 3, exportSchema = false)
+@Database(entities = {PlaceOfInterest.class}, version = 6, exportSchema = false)
 public abstract class PlaceOfInterestRoomDatabase extends RoomDatabase {
 
     public abstract PlaceOfInterestDAO placeOfInterestDAO();
