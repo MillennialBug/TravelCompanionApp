@@ -14,7 +14,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -50,7 +49,9 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
     private TextView mPoiLocation;
     private RatingBar mRating;
     private int mPosition = 0;
+    private Button mLocateButton;
     private Button mMapButton;
+    private Button mClearButton;
     private Button mShareButton;
     private Button mSaveButton;
     private Button mCancelButton;
@@ -83,7 +84,9 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
         mPoiSpinner = findViewById(R.id.poi_cat_spinner);
         mPoiLocation = findViewById(R.id.poi_location_text);
         mNotes = findViewById(R.id.poi_notes_text);
-        mMapButton = findViewById(R.id.button_location);
+        mLocateButton = findViewById(R.id.button_locate);
+        mMapButton = findViewById(R.id.button_map);
+        mClearButton = findViewById(R.id.button_clear_location);
         mShareButton = findViewById(R.id.button_share);
         mSaveButton = findViewById(R.id.button_save);
         mCancelButton = findViewById(R.id.button_cancel);
@@ -150,10 +153,17 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
             mPoiLongitude = poi.getLongitude();
             mPoiLatitude = poi.getLatitude();
         }
-        if(mPlaceOfInterest.getUserSetLocation()){
+        if(mPoiLongitude == 0d && mPoiLatitude == 0d){
             mPoiLocation.setText(poi.getLocation());
         } else {
-            mPoiLocation.setText(String.format("%s, %s",mPoiLongitude.toString(), mPoiLatitude.toString()));
+            mPoiLocation.setText(String.format("%s, %s",mPoiLatitude,mPoiLongitude));
+            mPoiLocation.setEnabled(false);
+        }
+
+        if (mPoiLocation.getText() == null) {
+            mMapButton.setEnabled(false);
+        } else if (mPoiLocation.getText().length() == 0) {
+            mMapButton.setEnabled(false);
         }
     }
 
@@ -219,11 +229,23 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
     }
 
     private void setButtonOnClicks() {
+        mLocateButton.setOnClickListener(view -> getLocation());
         mMapButton.setOnClickListener(view -> viewOnMap());
+        mClearButton.setOnClickListener(view -> clearLocation());
         mShareButton.setOnClickListener(view -> sharePlaceOfInterest());
         mSaveButton.setOnClickListener(view -> returnReply(mSaveButton));
         mCancelButton.setOnClickListener(view -> returnReply(mCancelButton));
         mPoiMainImage.setOnClickListener(view -> pickImage());
+
+    }
+
+    private void clearLocation() {
+        mPlaceOfInterest.resetLocation();
+        mPoiLocation.setEnabled(true);
+        mPoiLocation.setText(null);
+        mPoiLongitude = 0d;
+        mPoiLatitude = 0d;
+        mMapButton.setEnabled(false);
     }
 
     private void setTextChangeListeners() {
@@ -253,7 +275,13 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
             @Override
-            public void afterTextChanged(Editable editable) { itemChanged(mPoiLocation);}
+            public void afterTextChanged(Editable editable) {
+                itemChanged(mPoiLocation);
+                if(mPoiLocation.getText() != null || mPoiLocation.getText().length() > 0)
+                    mMapButton.setEnabled(true);
+                else
+                    mMapButton.setEnabled(false);
+            }
         });
         mNotes.addTextChangedListener(new TextWatcher() {
             @Override
@@ -287,8 +315,9 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
         String mimeType = "text/plain";
         String txt = String.format("Hey! Check this place out!\n" +
                 "Name: %s\n" +
+                "Location: %s\n" +
                 "Category: %s\n" +
-                "Description: %s", mPlaceOfInterest.getName(), mCategories[mPlaceOfInterest.getCategory()], mPlaceOfInterest.getShortDescription());
+                "Description: %s", mPlaceOfInterest.getName(), mPlaceOfInterest.getLocation(), mCategories[mPlaceOfInterest.getCategory()], mPlaceOfInterest.getShortDescription());
         ShareCompat.IntentBuilder
                 .from(this)
                 .setType(mimeType)
@@ -300,10 +329,16 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
     private void viewOnMap() {
         // Get the string indicating a location. Input is not validated; it is
         // passed to the location handler intact.
-        if (!mPlaceOfInterest.getLocation().isEmpty() || mPlaceOfInterest.getLocation() != null) {
-
+        if (mPlaceOfInterest.getLocation() != null) {
+            Uri addressUri;
             // Parse the location and create the intent.
-            Uri addressUri = Uri.parse("geo:0,0?q=" + mPlaceOfInterest.getLocation());
+            if(mPlaceOfInterest.getLatitude() == 0d && mPlaceOfInterest.getLongitude() == 0d) {
+                addressUri = Uri.parse("geo:0,0?q=" + mPlaceOfInterest.getLocation());
+            } else {
+                addressUri = Uri.parse("geo: " + mPlaceOfInterest.getLatitude() + "," + mPlaceOfInterest.getLongitude());
+            }
+
+            System.out.println(addressUri.toString());
             Intent intent = new Intent(Intent.ACTION_VIEW, addressUri);
 
             // Find an activity to handle the intent, and start that activity.
@@ -315,11 +350,7 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
 
     private void getLocation(){
         // getting GPS status
-        Boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-        // getting network status
-        Boolean isNetworkEnabled = locationManager
-                .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
         if (isGPSEnabled) {
             if (mLocation == null) {
@@ -338,14 +369,26 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
                             .getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
                     if (mLocation != null) {
-                        mPoiLatitude = mLocation.getLatitude();
-                        mPoiLongitude = mLocation.getLongitude();
-                        mPlaceOfInterest.setLongitude(mPoiLongitude);
-                        mPlaceOfInterest.setLatitude(mPoiLatitude);
+                        setLocationData();
+                    } else {
+                        clearLocation();
                     }
                 }
+            } else {
+                setLocationData();
             }
         }
+    }
+
+    private void setLocationData() {
+        mPoiLatitude = mLocation.getLatitude();
+        mPoiLongitude = mLocation.getLongitude();
+        mPlaceOfInterest.setLongitude(mPoiLongitude);
+        mPlaceOfInterest.setLatitude(mPoiLatitude);
+        mPlaceOfInterest.setLocation(String.format("%s, %s", mPoiLatitude.toString(), mPoiLongitude.toString()));
+        mPoiLocation.setText(mPlaceOfInterest.getLocation());
+        mPoiLocation.setEnabled(false);
+        mMapButton.setEnabled(true);
     }
 
     @Override

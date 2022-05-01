@@ -53,9 +53,6 @@ public class PlaceOfInterest implements Parcelable {
     @ColumnInfo(name = "latitude")
     private Double latitude;
 
-    @ColumnInfo(name = "userSetLocation")
-    private Boolean userSetLocation;
-
     //private int[] photos;
 
     public PlaceOfInterest(String name, String shortDescription, Float rating, int category, String notes) {
@@ -68,7 +65,6 @@ public class PlaceOfInterest implements Parcelable {
         setBitmap(MainActivity.BLANK_BITMAP);
         setLongitude(0d);
         setLatitude(0d);
-        setUserSetLocation(Boolean.FALSE);
     }
 
     public PlaceOfInterest(String name, String shortDescription, Float rating, int category, String notes, Bitmap bitmap) {
@@ -88,7 +84,6 @@ public class PlaceOfInterest implements Parcelable {
         setBitmap(MainActivity.BLANK_BITMAP);
         setLongitude(0d);
         setLatitude(0d);
-        setUserSetLocation(Boolean.FALSE);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -103,7 +98,6 @@ public class PlaceOfInterest implements Parcelable {
         location = in.readString();
         longitude = in.readDouble();
         latitude = in.readDouble();
-        userSetLocation = in.readBoolean();
         //in.readByteArray(bitmap);
     }
 
@@ -162,16 +156,13 @@ public class PlaceOfInterest implements Parcelable {
     public void setNotes(String notes) { this.notes = notes; }
 
     public String getLocation() { return this.location; }
-    public void setLocation(String location) { this.location = location; setUserSetLocation(Boolean.TRUE);}
+    public void setLocation(String location) { this.location = location;}
 
     public Double getLongitude() { return this.longitude; }
-    public void setLongitude(Double longitude) { this.longitude = longitude; setUserSetLocation(Boolean.FALSE);}
+    public void setLongitude(Double longitude) { this.longitude = longitude;}
 
     public Double getLatitude() { return latitude; }
     public void setLatitude(Double latitude) { this.latitude = latitude; }
-
-    public Boolean getUserSetLocation() { return userSetLocation; }
-    public void setUserSetLocation(Boolean userSetLocation) { this.userSetLocation = userSetLocation; }
 
     @Override
     public int describeContents() {
@@ -191,11 +182,16 @@ public class PlaceOfInterest implements Parcelable {
         parcel.writeString(location);
         parcel.writeDouble(longitude);
         parcel.writeDouble(latitude);
-        parcel.writeBoolean(userSetLocation);
         //parcel.writeByteArray(bitmap);
     }
 
     private void setDateAdded(){
         this.dateAdded = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault()).format(new Date());
+    }
+
+    public void resetLocation(){
+        setLocation(null);
+        setLatitude(0d);
+        setLongitude(0d);
     }
 }

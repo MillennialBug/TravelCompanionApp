@@ -15,7 +15,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import java.io.File;
 
-@Database(entities = {PlaceOfInterest.class}, version = 6, exportSchema = false)
+@Database(entities = {PlaceOfInterest.class}, version = 5, exportSchema = false)
 public abstract class PlaceOfInterestRoomDatabase extends RoomDatabase {
 
     public abstract PlaceOfInterestDAO placeOfInterestDAO();
@@ -27,11 +27,6 @@ public abstract class PlaceOfInterestRoomDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             PlaceOfInterestRoomDatabase.class, "place_of_interest_database")
-                            // Wipes and rebuilds instead of migrating
-                            // if no Migration object.
-                            // Migration is not part of this practical.
-                            .fallbackToDestructiveMigration()
-                            .addCallback(sRoomDatabaseCallback)
                             .build();
                 }
             }

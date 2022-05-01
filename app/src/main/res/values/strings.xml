@@ -28,6 +28,8 @@
     <string name="button_share_text">Share</string>
     <string name="button_save_text">Save</string>
     <string name="button_cancel_text">Cancel</string>
+    <string name="clear_button_text">Clear</string>
+    <string name="locate_button_text">Locate</string>
 
     <string-array name="poi_cat_array">
         <item>Amusement Park</item>

@@ -140,7 +140,17 @@
             app:layout_constraintStart_toStartOf="@id/poi_descr_text" />
 
         <Button
-            android:id="@+id/button_location"
+            android:id="@+id/button_locate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/locate_button_text"
+            app:layout_constraintEnd_toStartOf="@+id/button_map"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/poi_location_label" />
+
+        <Button
+            android:id="@+id/button_map"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -149,6 +159,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/poi_location_label" />
 
+        <Button
+            android:id="@+id/button_clear_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/clear_button_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/button_map"
+            app:layout_constraintTop_toBottomOf="@+id/poi_location_label"/>
+
         <!-- NOTES -->
 
         <TextView
@@ -156,10 +176,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:text="@string/poi_notes_label_text"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/button_location" />
+            app:layout_constraintTop_toBottomOf="@id/button_map" />
 
         <EditText
             android:id="@+id/poi_notes_text"
@@ -171,16 +191,6 @@
             android:hint="@string/poi_notes_hint"
             app:layout_constraintBaseline_toBaselineOf="@id/poi_notes_label"
             app:layout_constraintStart_toStartOf="@id/poi_descr_text" />
-
-        <!-- MAP
-        <com.google.android.gms.maps.MapView
-            android:id="@+id/poi_location_mapview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/poi_notes_text" /> -->
 
         <!-- IMAGES -->
         <!--
@@ -201,7 +211,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:text="@string/poi_date_added_text"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/poi_notes_text"
