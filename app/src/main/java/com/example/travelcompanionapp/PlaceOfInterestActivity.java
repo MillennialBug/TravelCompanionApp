@@ -141,8 +141,6 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
     public void initialisePoi(PlaceOfInterest poi) {
         mPoiName.setText(poi.getName());
         mPoiDescr.setText(poi.getShortDescription());
-        //if (poi.getBitmap() != MainActivity.BLANK_BITMAP)
-            //mPoiMainImage.setImageBitmap(poi.getBitmapAsBitmap());
         mPoiDateAdded.setText(poi.getDateAdded());
         mPoiSpinner.setSelection(poi.getCategory());
         mNotes.setText(poi.getNotes());
@@ -186,6 +184,7 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
         intent.setAction(Intent.ACTION_GET_CONTENT);
         pickImageResultLauncher.launch(Intent.createChooser(intent, "Select Picture"));
     }
+
     ActivityResultLauncher<Intent> pickImageResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
@@ -236,7 +235,6 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
         mSaveButton.setOnClickListener(view -> returnReply(mSaveButton));
         mCancelButton.setOnClickListener(view -> returnReply(mCancelButton));
         mPoiMainImage.setOnClickListener(view -> pickImage());
-
     }
 
     private void clearLocation() {
@@ -277,10 +275,8 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
             @Override
             public void afterTextChanged(Editable editable) {
                 itemChanged(mPoiLocation);
-                if(mPoiLocation.getText() != null || mPoiLocation.getText().length() > 0)
-                    mMapButton.setEnabled(true);
-                else
-                    mMapButton.setEnabled(false);
+                if(mPoiLocation.getText() != null)
+                    mMapButton.setEnabled(mPoiLocation.getText().length() > 0);
             }
         });
         mNotes.addTextChangedListener(new TextWatcher() {

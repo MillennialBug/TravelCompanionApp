@@ -53,8 +53,6 @@ public class PlaceOfInterest implements Parcelable {
     @ColumnInfo(name = "latitude")
     private Double latitude;
 
-    //private int[] photos;
-
     public PlaceOfInterest(String name, String shortDescription, Float rating, int category, String notes) {
         setName(name);
         setShortDescription(shortDescription);
@@ -65,16 +63,6 @@ public class PlaceOfInterest implements Parcelable {
         setBitmap(MainActivity.BLANK_BITMAP);
         setLongitude(0d);
         setLatitude(0d);
-    }
-
-    public PlaceOfInterest(String name, String shortDescription, Float rating, int category, String notes, Bitmap bitmap) {
-        setName(name);
-        setShortDescription(shortDescription);
-        setRating(rating);
-        setCategory(category);
-        setNotes(notes);
-        setDateAdded();
-        setBitmap(bitmap);
     }
 
     public PlaceOfInterest(){
@@ -98,7 +86,6 @@ public class PlaceOfInterest implements Parcelable {
         location = in.readString();
         longitude = in.readDouble();
         latitude = in.readDouble();
-        //in.readByteArray(bitmap);
     }
 
     public static final Creator<PlaceOfInterest> CREATOR = new Creator<PlaceOfInterest>() {
@@ -182,7 +169,6 @@ public class PlaceOfInterest implements Parcelable {
         parcel.writeString(location);
         parcel.writeDouble(longitude);
         parcel.writeDouble(latitude);
-        //parcel.writeByteArray(bitmap);
     }
 
     private void setDateAdded(){
