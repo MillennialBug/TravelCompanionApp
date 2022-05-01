@@ -43,6 +43,8 @@
             android:layout_marginEnd="8dp"
             android:autofillHints=""
             android:ems="8"
+            android:textColor="@color/dirty_cream"
+            android:textColorHint="@color/dirtier_cream"
             android:hint="@string/poi_name_hint"
             android:inputType="textCapWords"
             app:layout_constraintEnd_toEndOf="parent"
@@ -76,6 +78,7 @@
             android:id="@+id/poi_cat_label"
             style="@style/poi_field_label_style"
             android:text="@string/poi_cat_label_text"
+            android:layout_marginTop="-8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/poi_main_image"
             app:layout_constraintTop_toBottomOf="@+id/poi_ratingBar" />
@@ -86,6 +89,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
+            android:textColor="@color/dirty_cream"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/poi_main_image"
             app:layout_constraintTop_toBottomOf="@id/poi_cat_label" />
@@ -107,6 +111,8 @@
             android:layout_height="wrap_content"
             android:autofillHints=""
             android:ems="15"
+            android:textColor="@color/dirty_cream"
+            android:textColorHint="@color/dirtier_cream"
             android:hint="@string/poi_descr_hint"
             android:inputType="textLongMessage"
             app:layout_constraintBaseline_toBaselineOf="@id/poi_descr_label"
@@ -129,6 +135,8 @@
             android:layout_height="wrap_content"
             android:autofillHints=""
             android:ems="15"
+            android:textColor="@color/dirty_cream"
+            android:textColorHint="@color/dirtier_cream"
             android:hint="@string/poi_location_hint"
             android:inputType="textLongMessage"
             app:layout_constraintBaseline_toBaselineOf="@id/poi_location_label"
@@ -136,36 +144,30 @@
 
         <Button
             android:id="@+id/button_locate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@color/dirty_cream"
             android:text="@string/locate_button_text"
             app:cornerRadius="10dp"
             app:layout_constraintEnd_toStartOf="@+id/button_map"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/poi_location_label"
-            app:strokeColor="@color/dirty_cream" />
+            style="@style/button_style" />
 
         <Button
             android:id="@+id/button_map"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            app:cornerRadius="10dp"
             android:text="@string/button_location_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/poi_location_label" />
+            app:layout_constraintTop_toBottomOf="@+id/poi_location_label"
+            style="@style/button_style" />
 
         <Button
             android:id="@+id/button_clear_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            app:cornerRadius="10dp"
             android:text="@string/clear_button_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/button_map"
-            app:layout_constraintTop_toBottomOf="@+id/poi_location_label" />
+            app:layout_constraintTop_toBottomOf="@+id/poi_location_label"
+            style="@style/button_style" />
 
         <!-- NOTES -->
 
@@ -184,6 +186,8 @@
             android:layout_height="wrap_content"
             android:autofillHints=""
             android:ems="15"
+            android:textColor="@color/dirty_cream"
+            android:textColorHint="@color/dirtier_cream"
             android:hint="@string/poi_notes_hint"
             android:inputType="textMultiLine"
             app:layout_constraintBaseline_toBaselineOf="@id/poi_notes_label"
@@ -218,6 +222,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:textColor="@color/dirty_cream"
             android:text="@string/poi_placeholder_date"
             app:layout_constraintBaseline_toBaselineOf="@id/poi_date_added_label"
             app:layout_constraintStart_toEndOf="@id/poi_date_added_label" />
@@ -226,37 +231,34 @@
 
         <Button
             android:id="@+id/button_share"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            app:cornerRadius="10dp"
             android:text="@string/button_share_text"
             app:layout_constraintEnd_toStartOf="@id/button_save"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/poi_date_added_text" />
+            app:layout_constraintTop_toBottomOf="@+id/poi_date_added_text"
+            style="@style/button_style" />
 
         <!-- SAVE BUTTON -->
 
         <Button
             android:id="@+id/button_save"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            app:cornerRadius="10dp"
             android:text="@string/button_save_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/poi_date_added_text" />
+            app:layout_constraintTop_toBottomOf="@+id/poi_date_added_text"
+            style="@style/button_style" />
 
         <!-- CANCEL BUTTON -->
 
         <Button
             android:id="@+id/button_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            app:cornerRadius="10dp"
             android:text="@string/button_cancel_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/button_save"
-            app:layout_constraintTop_toBottomOf="@+id/poi_date_added_text" />
+            app:layout_constraintTop_toBottomOf="@+id/poi_date_added_text"
+            style="@style/button_style" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

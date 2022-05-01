@@ -8,4 +8,12 @@
         <item name="android:textColor">@color/dirty_cream</item>
         <item name="android:textStyle">bold</item>
     </style>
+
+    <style name="button_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:backgroundTint">@color/dirty_cream</item>
+        <item name="android:textColor">@color/grey_purple</item>
+    </style>
 </resources>

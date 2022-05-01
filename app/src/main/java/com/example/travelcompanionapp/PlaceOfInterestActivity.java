@@ -208,7 +208,7 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
     private void createSpinner(){
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.poi_cat_array, android.R.layout.simple_spinner_item);
+                R.array.poi_cat_array, R.layout.spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
@@ -331,7 +331,7 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
             if(mPlaceOfInterest.getLatitude() == 0d && mPlaceOfInterest.getLongitude() == 0d) {
                 addressUri = Uri.parse("geo:0,0?q=" + mPlaceOfInterest.getLocation());
             } else {
-                addressUri = Uri.parse("geo: " + mPlaceOfInterest.getLatitude() + "," + mPlaceOfInterest.getLongitude());
+                addressUri = Uri.parse("geo: " + mPlaceOfInterest.getLatitude() + "," + mPlaceOfInterest.getLongitude() + "?q=");
             }
 
             System.out.println(addressUri.toString());
@@ -349,29 +349,25 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
         boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
         if (isGPSEnabled) {
-            if (mLocation == null) {
-                //check the network permission
-                if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions((Activity) mContext, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
-                }
-                locationManager.requestLocationUpdates(
-                        LocationManager.GPS_PROVIDER,
-                        MIN_TIME_BW_UPDATES,
-                        MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+            //check the network permission
+            if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions((Activity) mContext, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
+            }
+            locationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    MIN_TIME_BW_UPDATES,
+                    MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
-                Log.d("GPS Enabled", "GPS Enabled");
-                if (locationManager != null) {
-                    mLocation = locationManager
-                            .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Log.d("GPS Enabled", "GPS Enabled");
+            if (locationManager != null) {
+                mLocation = locationManager
+                        .getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-                    if (mLocation != null) {
-                        setLocationData();
-                    } else {
-                        clearLocation();
-                    }
+                if (mLocation != null) {
+                    setLocationData();
+                } else {
+                    clearLocation();
                 }
-            } else {
-                setLocationData();
             }
         }
     }
