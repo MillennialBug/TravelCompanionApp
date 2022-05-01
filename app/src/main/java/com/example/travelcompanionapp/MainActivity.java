@@ -72,10 +72,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             mAdapter.setPlaceOfInterests(placeOfInterests);
         });
 
-        requestLocation();
+        requestLocationPermission();
+        ///data/user/0/com.example.travelcompanionapp/files
     }
 
-    private void requestLocation() {
+    private void requestLocationPermission() {
         try {
             if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
                 ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 101);

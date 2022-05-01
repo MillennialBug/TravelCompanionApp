@@ -37,12 +37,11 @@
 
         <EditText
             android:id="@+id/poi_name_text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:autofillHints=""
-            android:ems="8"
             android:textColor="@color/dirty_cream"
             android:textColorHint="@color/dirtier_cream"
             android:hint="@string/poi_name_hint"
@@ -107,16 +106,17 @@
 
         <EditText
             android:id="@+id/poi_descr_text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:autofillHints=""
-            android:ems="15"
             android:textColor="@color/dirty_cream"
             android:textColorHint="@color/dirtier_cream"
+            android:layout_marginEnd="8dp"
             android:hint="@string/poi_descr_hint"
             android:inputType="textLongMessage"
             app:layout_constraintBaseline_toBaselineOf="@id/poi_descr_label"
-            app:layout_constraintStart_toEndOf="@id/poi_descr_label" />
+            app:layout_constraintStart_toEndOf="@id/poi_descr_label"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
         <!-- LOCATION -->
 
@@ -131,16 +131,17 @@
 
         <EditText
             android:id="@+id/poi_location_text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:autofillHints=""
-            android:ems="15"
+            android:layout_marginEnd="8dp"
             android:textColor="@color/dirty_cream"
             android:textColorHint="@color/dirtier_cream"
             android:hint="@string/poi_location_hint"
             android:inputType="textLongMessage"
             app:layout_constraintBaseline_toBaselineOf="@id/poi_location_label"
-            app:layout_constraintStart_toStartOf="@id/poi_descr_text" />
+            app:layout_constraintStart_toStartOf="@id/poi_descr_text"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
         <Button
             android:id="@+id/button_locate"
@@ -182,16 +183,17 @@
 
         <EditText
             android:id="@+id/poi_notes_text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:autofillHints=""
-            android:ems="15"
             android:textColor="@color/dirty_cream"
             android:textColorHint="@color/dirtier_cream"
             android:hint="@string/poi_notes_hint"
             android:inputType="textMultiLine"
+            android:layout_marginEnd="8dp"
             app:layout_constraintBaseline_toBaselineOf="@id/poi_notes_label"
-            app:layout_constraintStart_toStartOf="@id/poi_descr_text" />
+            app:layout_constraintStart_toStartOf="@id/poi_descr_text"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
         <!-- IMAGES -->
         <!--
