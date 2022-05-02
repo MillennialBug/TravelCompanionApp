@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,6 +45,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
 
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
+
+        // FAB!!!
         binding.fab.setOnClickListener(view -> {
             int itemCount = mAdapter.getItemCount();
             Intent poiIntent = new Intent(MainActivity.this, PlaceOfInterestActivity.class);
@@ -70,6 +73,24 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             // Update the cached copy of the words in the adapter.
             mAdapter.setPlaceOfInterests(placeOfInterests);
         });
+
+        ItemTouchHelper helper = new ItemTouchHelper(new
+             ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+                 @Override
+                 public boolean onMove(RecyclerView recyclerView,
+                                       RecyclerView.ViewHolder viewHolder,
+                                       RecyclerView.ViewHolder target) {
+                     return false;
+                 }
+
+                 @Override
+                 public void onSwiped(RecyclerView.ViewHolder viewHolder,
+                                      int direction) {
+                     mPlaceOfInterestViewModel.delete(mAdapter.getPlaceOfInterestAtPosition(viewHolder.getAdapterPosition()));
+                     mAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+                 }
+             });
+        helper.attachToRecyclerView(mRecyclerView);
 
         requestPermissions();
     }
@@ -108,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             myAlertBuilder.setTitle("Instructions");
             myAlertBuilder.setMessage("Add a Place of Interest with the plus button in the bottom corner.\n" +
                     "Click an item to edit it.\n" +
-                    "Long click an item to delete.");
+                    "Long click or swipe an item left to delete.");
             // Add the dialog buttons.
             myAlertBuilder.setPositiveButton("OK", (dialog, which) -> {
                 // User clicked OK button.
@@ -179,15 +200,5 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         });
 
         myAlertBuilder.show();
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mPlaceOfInterestViewModel.getAllPlaceOfInterests().observe(this, placeOfInterests -> {
-            // Update the cached copy of the words in the adapter.
-            mAdapter.setPlaceOfInterests(placeOfInterests);
-        });
     }
 }

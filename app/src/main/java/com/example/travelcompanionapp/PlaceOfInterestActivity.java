@@ -274,7 +274,7 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
 
     private void clearLocation() {
         mPlaceOfInterest.resetLocation();
-        mPoiLocation.setVisibility(View.VISIBLE);
+        mPoiLocation.setEnabled(true);
         mPoiLocation.setText(null);
         mPoiLongitude = 0d;
         mPoiLatitude = 0d;
@@ -420,7 +420,7 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
         mPlaceOfInterest.setLatitude(mPoiLatitude);
         mPlaceOfInterest.setLocation(String.format("%s, %s", mPoiLatitude.toString(), mPoiLongitude.toString()));
         mPoiLocation.setText(mPlaceOfInterest.getLocation());
-        mPoiLocation.setVisibility(View.INVISIBLE);
+        mPoiLocation.setEnabled(false);
         mMapButton.setVisibility(View.VISIBLE);
     }
 
