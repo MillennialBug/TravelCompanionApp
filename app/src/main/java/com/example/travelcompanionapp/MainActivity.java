@@ -1,13 +1,12 @@
 package com.example.travelcompanionapp;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -24,15 +23,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.travelcompanionapp.databinding.ActivityMainBinding;
 
-import android.view.Menu;
-import android.view.MenuItem;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements RecyclerViewInterface {
     private RecyclerView mRecyclerView;
     private PlaceOfInterestAdapter mAdapter;
     private PlaceOfInterestViewModel mPlaceOfInterestViewModel;
 
-    public static final byte[] BLANK_BITMAP = new byte[1];
     public static final String POI_EXTRA =
             "com.example.android.travelcompanionapp.extra.POI_EXTRA";
     public static final String POI_POS =
@@ -42,15 +39,17 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         com.example.travelcompanionapp.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+
+
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
         binding.fab.setOnClickListener(view -> {
             int itemCount = mAdapter.getItemCount();
             Intent poiIntent = new Intent(MainActivity.this, PlaceOfInterestActivity.class);
-            poiIntent.putExtra(MainActivity.POI_EXTRA, new PlaceOfInterest());
             poiIntent.putExtra(POI_POS, itemCount);
+            PlaceOfInterest newPoi = new PlaceOfInterest();
+            poiIntent.putExtra(POI_EXTRA, newPoi);
             newPlaceOfInterestResultLauncher.launch(poiIntent);
         });
 
@@ -72,14 +71,20 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             mAdapter.setPlaceOfInterests(placeOfInterests);
         });
 
-        requestLocationPermission();
-        ///data/user/0/com.example.travelcompanionapp/files
+        requestPermissions();
     }
 
-    private void requestLocationPermission() {
+    private void requestPermissions() {
         try {
             if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
                 ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 101);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        try {
+            if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 101);
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -156,13 +161,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             });
 
     @Override
-    public void onActivityResult(int requestCode,
-                                 int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-    }
-
-    @Override
     public void onItemLongClick(int position) {
         String poiName = mAdapter.getPlaceOfInterestAtPosition(position).getName();
         AlertDialog.Builder myAlertBuilder = new
@@ -182,5 +180,14 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
 
         myAlertBuilder.show();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mPlaceOfInterestViewModel.getAllPlaceOfInterests().observe(this, placeOfInterests -> {
+            // Update the cached copy of the words in the adapter.
+            mAdapter.setPlaceOfInterests(placeOfInterests);
+        });
     }
 }

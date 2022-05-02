@@ -11,9 +11,10 @@ public class PlaceOfInterestRepository {
 
     private PlaceOfInterestDAO mPlaceOfInterestDao;
     private LiveData<List<PlaceOfInterest>> mAllPlaceOfInterests;
+    private PlaceOfInterestRoomDatabase db;
 
     PlaceOfInterestRepository(Application application) {
-        PlaceOfInterestRoomDatabase db = PlaceOfInterestRoomDatabase.getDatabase(application);
+        db = PlaceOfInterestRoomDatabase.getDatabase(application);
         mPlaceOfInterestDao = db.placeOfInterestDAO();
         mAllPlaceOfInterests = mPlaceOfInterestDao.getAllPlaceOfInterests();
     }

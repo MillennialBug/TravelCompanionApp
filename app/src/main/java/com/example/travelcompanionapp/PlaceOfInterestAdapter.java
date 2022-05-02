@@ -1,6 +1,7 @@
 package com.example.travelcompanionapp;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,14 +12,13 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class PlaceOfInterestAdapter extends
         RecyclerView.Adapter<PlaceOfInterestAdapter.PlaceOfInterestHolder>{
     private ArrayList<PlaceOfInterest> mPlaceOfInterestList;
-    private LayoutInflater mInflater;
-    private RecyclerViewInterface mRecyclerViewInterface;
+    private final LayoutInflater mInflater;
+    private final RecyclerViewInterface mRecyclerViewInterface;
 
     public PlaceOfInterestAdapter(Context context, RecyclerViewInterface recyclerViewInterface) {
         mInflater = LayoutInflater.from(context);
@@ -39,7 +39,8 @@ public class PlaceOfInterestAdapter extends
             holder.placeOfInterestNameText.setText(mCurrent.getName());
             holder.placeOfInterestDescrText.setText(mCurrent.getShortDescription());
             holder.placeOfInterestDateAddedText.setText(mCurrent.getDateAdded());
-            //holder.placeOfInterestMainImage.setImageBitmap(mCurrent.getBitmapAsBitmap());
+            if(mCurrent.getMainImage() != null)
+                holder.placeOfInterestMainImage.setImageBitmap(BitmapFactory.decodeByteArray(mCurrent.getMainImage(),0,mCurrent.getMainImage().length));
         }
     }
 

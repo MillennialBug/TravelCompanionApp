@@ -13,10 +13,7 @@ import java.util.List;
 public interface PlaceOfInterestDAO {
 
     @Insert
-    void insert(PlaceOfInterest placeOfInterest);
-
-    @Query("DELETE FROM place_of_interest")
-    void deleteAll();
+    long insert(PlaceOfInterest placeOfInterest);
 
     @Delete
     void delete(PlaceOfInterest placeOfInterest);
@@ -26,5 +23,4 @@ public interface PlaceOfInterestDAO {
 
     @Query("SELECT * FROM place_of_interest")
     LiveData<List<PlaceOfInterest>> getAllPlaceOfInterests();
-
 }

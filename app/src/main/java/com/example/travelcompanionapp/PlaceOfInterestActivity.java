@@ -31,11 +31,13 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ShareCompat;
 
-import java.io.FileNotFoundException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 public class PlaceOfInterestActivity extends AppCompatActivity implements LocationListener {
@@ -53,6 +55,7 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
     private Button mMapButton;
     private Button mClearButton;
     private Button mShareButton;
+    private Button mGalleryButton;
     private Button mSaveButton;
     private Button mCancelButton;
     private PlaceOfInterest mPlaceOfInterest;
@@ -62,12 +65,16 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
     private Double mPoiLatitude;
     private Location mLocation;
     private Context mContext;
+    private Boolean changeMade = false;
 
     // The minimum distance to change Updates in meters
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
 
     // The minimum time between updates in milliseconds
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60; // 1 minute
+
+    public static final String POI_ID =
+            "com.example.android.travelcompanionapp.extra.POI_ID";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +95,7 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
         mMapButton = findViewById(R.id.button_map);
         mClearButton = findViewById(R.id.button_clear_location);
         mShareButton = findViewById(R.id.button_share);
+        mGalleryButton = findViewById(R.id.button_gallery);
         mSaveButton = findViewById(R.id.button_save);
         mCancelButton = findViewById(R.id.button_cancel);
 
@@ -98,19 +106,12 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
         Intent intent = getIntent();
 
         // Retrieve POI info from Intent
-        if (intent.hasExtra(MainActivity.POI_POS))
-            mPosition = intent.getIntExtra(MainActivity.POI_POS, 0);
-
-        if (intent.hasExtra(MainActivity.POI_EXTRA)) {
-            mPlaceOfInterest = intent.getParcelableExtra(MainActivity.POI_EXTRA);
-        } else {
-            mPlaceOfInterest = new PlaceOfInterest();
-        }
+        mPosition = intent.getIntExtra(MainActivity.POI_POS, 0);
+        mPlaceOfInterest = intent.getParcelableExtra(MainActivity.POI_EXTRA);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 
         initialisePoi(mPlaceOfInterest);
         initialiseCategories();
@@ -140,6 +141,8 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
 
     public void initialisePoi(PlaceOfInterest poi) {
         mPoiName.setText(poi.getName());
+        if(mPlaceOfInterest.getMainImage() != null)
+            mPoiMainImage.setImageBitmap(BitmapFactory.decodeByteArray(mPlaceOfInterest.getMainImage(),0,mPlaceOfInterest.getMainImage().length));
         mPoiDescr.setText(poi.getShortDescription());
         mPoiDateAdded.setText(poi.getDateAdded());
         mPoiSpinner.setSelection(poi.getCategory());
@@ -163,19 +166,41 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
         } else if (mPoiLocation.getText().length() == 0) {
             mMapButton.setEnabled(false);
         }
+
+        if (mPlaceOfInterest.getId() == 0){
+            mGalleryButton.setVisibility(View.INVISIBLE);
+        }
     }
 
     public void returnReply(View view) {
         int viewId = view.getId();
         Intent replyIntent = new Intent();
+        replyIntent.putExtra(MainActivity.POI_POS, mPosition);
+        replyIntent.putExtra(MainActivity.POI_EXTRA, mPlaceOfInterest);
         if(viewId == R.id.button_save) {
-            replyIntent.putExtra(MainActivity.POI_POS, mPosition);
-            replyIntent.putExtra(MainActivity.POI_EXTRA, mPlaceOfInterest);
             setResult(RESULT_OK,replyIntent);
+            finish();
         } else {
-            setResult(RESULT_CANCELED);
+            if (changeMade) {
+                AlertDialog.Builder myAlertBuilder = new
+                        AlertDialog.Builder(PlaceOfInterestActivity.this);
+                // Set the dialog title and message.
+                myAlertBuilder.setTitle("Please confirm");
+                myAlertBuilder.setMessage("All changes will be lost. Continue?");
+                // Add the dialog buttons.
+                myAlertBuilder.setPositiveButton("YES", (dialog, which) -> {
+                    setResult(RESULT_CANCELED);
+                    finish();
+                });
+                myAlertBuilder.setNegativeButton("NO", (dialog, which) -> {
+                    // User clicked NO button.
+                });
+                myAlertBuilder.show();
+            } else {
+                setResult(RESULT_CANCELED);
+                finish();
+            }
         }
-        finish();
     }
 
     private void pickImage() {
@@ -195,10 +220,13 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
                         assert intent != null;
                         try {
                             InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(intent.getData());
-                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                            mPlaceOfInterest.setBitmap(bitmap);
-                            mPoiMainImage.setImageBitmap(bitmap);
-                        } catch (FileNotFoundException e) {
+                            Bitmap bm = BitmapFactory.decodeStream(inputStream);
+                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            bm.compress(Bitmap.CompressFormat.JPEG,80,stream);
+                            mPlaceOfInterest.setMainImage(stream.toByteArray());
+                            mPoiMainImage.setImageBitmap(BitmapFactory.decodeByteArray(mPlaceOfInterest.getMainImage(),0,mPlaceOfInterest.getMainImage().length));
+                            changeMade = true;
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
@@ -235,15 +263,22 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
         mSaveButton.setOnClickListener(view -> returnReply(mSaveButton));
         mCancelButton.setOnClickListener(view -> returnReply(mCancelButton));
         mPoiMainImage.setOnClickListener(view -> pickImage());
+        mGalleryButton.setOnClickListener(view -> launchGallery());
+    }
+
+    private void launchGallery() {
+        Intent galleryIntent = new Intent(PlaceOfInterestActivity.this, GalleryActivity.class);
+        galleryIntent.putExtra(POI_ID, mPlaceOfInterest.getId());
+        startActivity(galleryIntent);
     }
 
     private void clearLocation() {
         mPlaceOfInterest.resetLocation();
-        mPoiLocation.setEnabled(true);
+        mPoiLocation.setVisibility(View.VISIBLE);
         mPoiLocation.setText(null);
         mPoiLongitude = 0d;
         mPoiLatitude = 0d;
-        mMapButton.setEnabled(false);
+        mMapButton.setVisibility(View.INVISIBLE);
     }
 
     private void setTextChangeListeners() {
@@ -255,6 +290,7 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
             @Override
             public void afterTextChanged(Editable editable) {
                 itemChanged(mPoiName);
+                changeMade = true;
             }
         });
         mPoiDescr.addTextChangedListener(new TextWatcher() {
@@ -265,6 +301,7 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
             @Override
             public void afterTextChanged(Editable editable) {
                 itemChanged(mPoiDescr);
+                changeMade = true;
             }
         });
         mPoiLocation.addTextChangedListener(new TextWatcher() {
@@ -275,8 +312,12 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
             @Override
             public void afterTextChanged(Editable editable) {
                 itemChanged(mPoiLocation);
+                changeMade = true;
                 if(mPoiLocation.getText() != null)
-                    mMapButton.setEnabled(mPoiLocation.getText().length() > 0);
+                    if (mPoiLocation.getText().length() > 0)
+                        mMapButton.setVisibility(View.VISIBLE);
+                    else
+                        mMapButton.setVisibility(View.INVISIBLE);
             }
         });
         mNotes.addTextChangedListener(new TextWatcher() {
@@ -285,7 +326,7 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
             @Override
-            public void afterTextChanged(Editable editable) { itemChanged(mNotes); }
+            public void afterTextChanged(Editable editable) { itemChanged(mNotes); changeMade = true; }
         });
     }
 
@@ -379,8 +420,8 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
         mPlaceOfInterest.setLatitude(mPoiLatitude);
         mPlaceOfInterest.setLocation(String.format("%s, %s", mPoiLatitude.toString(), mPoiLongitude.toString()));
         mPoiLocation.setText(mPlaceOfInterest.getLocation());
-        mPoiLocation.setEnabled(false);
-        mMapButton.setEnabled(true);
+        mPoiLocation.setVisibility(View.INVISIBLE);
+        mMapButton.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -399,5 +440,6 @@ public class PlaceOfInterestActivity extends AppCompatActivity implements Locati
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
+
     }
 }

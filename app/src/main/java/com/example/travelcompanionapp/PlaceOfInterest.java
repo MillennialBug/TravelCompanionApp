@@ -1,7 +1,5 @@
 package com.example.travelcompanionapp;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -11,7 +9,6 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -23,11 +20,11 @@ public class PlaceOfInterest implements Parcelable {
     @ColumnInfo(name = "id")
     private int id;
 
-    @ColumnInfo(name = "Bitmap")
-    private byte[] bitmap;
-
     @ColumnInfo(name = "name")
     private String name;
+
+    @ColumnInfo(name = "main_image")
+    private byte[] mainImage;
 
     @ColumnInfo(name = "short_description")
     private String shortDescription;
@@ -38,7 +35,7 @@ public class PlaceOfInterest implements Parcelable {
     @ColumnInfo(name = "rating")
     private Float rating;
 
-    @ColumnInfo(name = "catergory")
+    @ColumnInfo(name = "category")
     private int category;
 
     @ColumnInfo(name = "notes")
@@ -53,23 +50,9 @@ public class PlaceOfInterest implements Parcelable {
     @ColumnInfo(name = "latitude")
     private Double latitude;
 
-    public PlaceOfInterest(String name, String shortDescription, Float rating, int category, String notes) {
-        setName(name);
-        setShortDescription(shortDescription);
-        setRating(rating);
-        setCategory(category);
-        setNotes(notes);
-        setDateAdded();
-        setBitmap(MainActivity.BLANK_BITMAP);
-        setLongitude(0d);
-        setLatitude(0d);
-    }
-
     public PlaceOfInterest(){
         setDateAdded();
         setRating(0f);
-        //setBitmap(((BitmapDrawable) Drawable.createFromPath("/storage/emulated/0/Download/poi_main_image_placeholder.png")).getBitmap());
-        setBitmap(MainActivity.BLANK_BITMAP);
         setLongitude(0d);
         setLatitude(0d);
     }
@@ -78,6 +61,7 @@ public class PlaceOfInterest implements Parcelable {
     protected PlaceOfInterest(Parcel in) {
         id = in.readInt();
         name = in.readString();
+        mainImage = in.createByteArray();
         shortDescription = in.readString();
         dateAdded = in.readString();
         rating = in.readFloat();
@@ -109,6 +93,9 @@ public class PlaceOfInterest implements Parcelable {
     }
     public void setName(String name) {this.name = name;}
 
+    public byte[] getMainImage() { return mainImage; }
+    public void setMainImage(byte[] mainImage) { this.mainImage = mainImage; }
+
     public String getShortDescription() {
         return this.shortDescription;
     }
@@ -119,20 +106,6 @@ public class PlaceOfInterest implements Parcelable {
     }
     public void setDateAdded(String dateAdded) { this.dateAdded = dateAdded; }
 
-    public Bitmap getBitmapAsBitmap() {
-        return BitmapFactory.decodeByteArray(this.bitmap, 0, this.bitmap.length);
-    }
-
-    public byte[] getBitmap() {
-        return bitmap;
-    }
-    public void setBitmap(byte[] bitmap){this.bitmap = bitmap;}
-
-    public void setBitmap(Bitmap bitmap) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
-        this.bitmap = stream.toByteArray();
-    }
     public Float getRating() { return this.rating; }
     public void setRating(Float rating) { this.rating = rating; }
 
@@ -161,6 +134,7 @@ public class PlaceOfInterest implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(id);
         parcel.writeString(name);
+        parcel.writeByteArray(mainImage);
         parcel.writeString(shortDescription);
         parcel.writeString(dateAdded);
         parcel.writeFloat(rating);

@@ -45,4 +45,8 @@
         <item>Theater</item>
         <item>Zoo</item>
     </string-array>
+    <string name="title_activity_gallery">GalleryActivity</string>
+    <string name="button_gallery_label">View Gallery</string>
+    <string name="button_camera_label">Take Photo</string>
+    <string name="button_select_label">Select Photo</string>
 </resources>
